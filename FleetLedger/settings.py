@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "fleet"
 ]
 
+AUTH_USER_MODEL = 'companies_and_users.User'
 PHONENUMBER_DEFAULT_REGION = None
 
 MIDDLEWARE = [
