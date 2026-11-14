@@ -1,24 +1,13 @@
 from django.core.validators import MinValueValidator
 from django.db import models
-from FleetLedger.companies_and_users.models import Company, Employee
-from FleetLedger.fleet.models import Vehicle
+from FleetLedger.companies_and_users.models import Company
+from FleetLedger.fleet.models import Vehicle, Employee
 # Create your models here.
 
 
 class ExpenseCategory(models.Model):
-    EXPENSE_CHOICES = [
-        ("fuel", "Fuel"),
-        ("toll", "Toll"),
-        ("repair and maintenance", "Repair and Maintenance"),
-        ("driver allowance", "Driver Allowance"),
-        ("police or fine payments", "Police or fine payments"),
-        ("others", "Others"),
-    ]
-    company = models.ForeignKey(Company, on_delete=models.SET_NULL, related_name="expense_category")
-    name = models.CharField(
-        max_length=100,
-        choices=EXPENSE_CHOICES,
-    )
+    company = models.ForeignKey(Company, on_delete=models.PROTECT, related_name="expense_category")
+    name = models.CharField(max_length=100)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -41,9 +30,9 @@ class DailyEntry(models.Model):
         ("approved", "Approved"),
     ]
 
-    company = models.ForeignKey(Company, on_delete=models.SET_NULL, related_name="daily_entries")
-    vehicle = models.ForeignKey(Vehicle, on_delete=models.SET_NULL, related_name="daily_entries")
-    driver = models.ForeignKey(Employee, on_delete=models.SET_NULL, related_name="daily_entries")
+    company = models.ForeignKey(Company, on_delete=models.PROTECT, related_name="daily_entries")
+    vehicle = models.ForeignKey(Vehicle, on_delete=models.PROTECT, related_name="daily_entries")
+    driver = models.ForeignKey(Employee, on_delete=models.PROTECT, related_name="daily_entries")
     date = models.DateField()
     income = models.DecimalField(
         max_digits=12,
@@ -63,7 +52,7 @@ class DailyEntry(models.Model):
         default=0,
     )
     commission_rate = models.DecimalField(
-        max_digits=3,
+        max_digits=5,
         decimal_places=2,
         validators=[MinValueValidator(0)],
     )
@@ -93,10 +82,11 @@ class DailyEntry(models.Model):
 
 
 class DailyExpenseLine(models.Model):
-    daily_entry = models.ForeignKey(DailyEntry, on_delete=models.CASCADE)
+    daily_entry = models.ForeignKey(DailyEntry, on_delete=models.CASCADE, related_name="daily_expense_line")
     expense_category = models.ForeignKey(
         ExpenseCategory,
-        on_delete=models.SET_NULL,
+        on_delete=models.PROTECT,
+        related_name="daily_expense_line",
     )
     amount = models.DecimalField(
         max_digits=12,
@@ -104,8 +94,6 @@ class DailyExpenseLine(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
-        pass
 
 
 

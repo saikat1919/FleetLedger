@@ -2,6 +2,7 @@ from django.core.validators import MinValueValidator
 from django.db import models
 from FleetLedger.companies_and_users.models import Company
 from FleetLedger.fleet.models import Employee
+from FleetLedger.FleetLedger import settings
 
 
 # Create your models here.
@@ -23,19 +24,43 @@ class MonthClose(models.Model):
         default=0,
         validators=[MinValueValidator(0)]
     )
-    total_expense = models.DecimalField(
+    total_expenses = models.DecimalField(
         max_digits=12,
         decimal_places=2,
         default=0,
         validators=[MinValueValidator(0)]
+    )
+    total_commission = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        default=0
+    )
+    total_salary = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        default=0
     )
     closed_month_profit = models.DecimalField(
         max_digits=12,
         decimal_places=2,
         default=0
     )
-    closed_by = models.ForeignKey(Employee, on_delete=models.SET_NULL, related_name='month_close')
-    closed_at = models.DateField()
+    closed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name='closed_months',
+    )
+    closed_at = models.DateField(null=True, blank=True)
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["company", "year_and_month"],
+                name="one_month_close_per_company",
+            )
+        ]
+        ordering = ["-year_and_month"]
 
     def __str__(self):
         return f"Monthly profit -> {self.closed_month_profit}, Closed by {self.closed_by}"

@@ -48,7 +48,7 @@ class Employee(models.Model):
         validators=[MinValueValidator(0)]
     )
     commission_rate = models.DecimalField(
-        max_digits=3,
+        max_digits=5,
         decimal_places=2,
         null=True,
         blank=True,
@@ -82,8 +82,9 @@ class Vehicle(models.Model):
     company = models.ForeignKey(
         Company,
         on_delete=models.SET_NULL,
+        null=True
     )
-    registration_number = models.CharField(unique=True, max_length=50)
+    registration_number = models.CharField(max_length=50)
     vehicle_model = models.CharField(max_length=100)
     status = models.CharField(
         max_length=50,
@@ -106,10 +107,12 @@ class VehicleAssignment(models.Model):
     company = models.ForeignKey(
         Company,
         on_delete=models.SET_NULL,
+        null=True
     )
     vehicle = models.ForeignKey(
         Vehicle,
         on_delete=models.SET_NULL,
+        null=True
     )
     driver = models.ForeignKey(
         Employee,
@@ -132,14 +135,14 @@ class VehicleAssignment(models.Model):
                 name="one_unique_driver_per_vehicle"
             ),
             models.UniqueConstraint(
-                fields=["employee"],
+                fields=["driver"],
                 condition=Q(end_date__isnull=True),
                 name="one_current_vehicle_per_driver"
             ),
-            models.UniqueConstraint(
+            models.CheckConstraint(
                 condition=(
-                    Q(end_date__isnull=True) |
-                    Q(end_date__gte=models.F('start_date'))
+                        Q(end_date__isnull=True) |
+                        Q(end_date__gte=models.F("start_date"))
                 ),
                 name="assignment_end_after_start_date"
             )
@@ -147,7 +150,7 @@ class VehicleAssignment(models.Model):
 
     def __str__(self):
         return (
-            f"{self.driver.name} - "
+            f"{self.driver.first_name} {self.driver.last_name} - "
             f"{self.vehicle.registration_number}"
         )
 
