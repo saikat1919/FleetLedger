@@ -42,7 +42,10 @@ INSTALLED_APPS = [
     'phonenumber_field',
     "companies_and_users",
     "daily_operations",
-    "fleet"
+    "fleet",
+    "attendance",
+    "payroll",
+    "audit",
 ]
 
 AUTH_USER_MODEL = 'companies_and_users.User'
