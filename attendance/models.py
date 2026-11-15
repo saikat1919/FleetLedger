@@ -11,8 +11,8 @@ class Attendance(models.Model):
         ("leave", "Leave"),
         ("half-day", "Half Day"),
     ]
-    company = models.ForeignKey(Company, on_delete=models.SET_NULL, related_name="attendance")
-    employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, related_name="attendance")
+    company = models.ForeignKey(Company, on_delete=models.SET_NULL, null=True, related_name="attendance")
+    employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null=True, related_name="attendance")
     date = models.DateField()
     status = models.CharField(
         max_length=100,

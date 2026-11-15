@@ -13,7 +13,7 @@ class MonthClose(models.Model):
         ("closed", "Closed"),
     ]
     company = models.ForeignKey(Company, on_delete=models.SET_NULL, related_name='month_close')
-    year_and_month = models.DateField()
+    month = models.DateField()
     status = models.CharField(
         max_length=10,
         choices=STATUS_CHOICES
@@ -52,15 +52,15 @@ class MonthClose(models.Model):
         blank=True,
         related_name='closed_months',
     )
-    closed_at = models.DateField(null=True, blank=True)
+    closed_at = models.DateTimeField(null=True, blank=True)
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=["company", "year_and_month"],
+                fields=["company", "month"],
                 name="one_month_close_per_company",
             )
         ]
-        ordering = ["-year_and_month"]
+        ordering = ["-month"]
 
     def __str__(self):
         return f"Monthly profit -> {self.closed_month_profit}, Closed by {self.closed_by}"
@@ -78,7 +78,7 @@ class Payroll(models.Model):
         max_length=10,
         choices=STATUS_CHOICES
     )
-    generated_by = models.ForeignKey(Employee, on_delete=models.SET_NULL, related_name='payroll')
+    generated_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name='payroll')
     generated_at = models.DateField()
 
     class Meta:

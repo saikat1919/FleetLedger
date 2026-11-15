@@ -107,16 +107,19 @@ class VehicleAssignment(models.Model):
     company = models.ForeignKey(
         Company,
         on_delete=models.SET_NULL,
-        null=True
+        null=True,
+        related_name='vehicle_assignments'
     )
     vehicle = models.ForeignKey(
         Vehicle,
         on_delete=models.SET_NULL,
-        null=True
+        null=True,
+        related_name="vehicle_assignments"
     )
     driver = models.ForeignKey(
         Employee,
         on_delete=models.SET_NULL,
+        null=True,
         related_name='vehicle_assignments',
     )
     start_date = models.DateField()
