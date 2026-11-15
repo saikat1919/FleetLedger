@@ -61,7 +61,7 @@ class MonthClose(models.Model):
                 fields=["company", "month"],
                 name="one_month_close_per_company",
             ),
-            models.UniqueConstraint(
+            models.CheckConstraint(
                 condition=Q(status='open', closed_by__isnull=True, closed_at__isnull=True) |
                         Q(status='closed', closed_by__isnull=False, closed_at__isnull=False),
                 name="closed_month_has_closer"

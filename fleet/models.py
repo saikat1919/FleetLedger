@@ -70,11 +70,11 @@ class Employee(models.Model):
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(
+            models.CheckConstraint(
                 condition=(Q(pay_type="commission") | Q(monthly_salary__isnull=False)),
                 name="salary_pay_needs_salary"
             ),
-            models.UniqueConstraint(
+            models.CheckConstraint(
                 condition=(Q(pay_type="salary") | Q(commission_rate__isnull=False)),
                 name="commission_needs_rate"
             ),

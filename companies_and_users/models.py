@@ -58,7 +58,7 @@ class User(AbstractUser):
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(
+            models.CheckConstraint(
                 condition=Q(role='company_admin', company__isnull=True) |
                           (~Q(role='platform_admin') & Q(company__isnull=False)),
                 name='platform_admin_has_no_company'
