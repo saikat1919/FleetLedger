@@ -1,6 +1,6 @@
 from django.db import models
-from FleetLedger.companies_and_users.models import Company
-from FleetLedger.fleet.models import Employee
+from companies_and_users.models import Company
+from fleet.models import Employee
 
 # Create your models here.
 
@@ -11,8 +11,8 @@ class Attendance(models.Model):
         ("leave", "Leave"),
         ("half-day", "Half Day"),
     ]
-    company = models.ForeignKey(Company, on_delete=models.SET_NULL, null=True, related_name="attendance")
-    employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null=True, related_name="attendance")
+    company = models.ForeignKey(Company, on_delete=models.PROTECT, related_name="attendance")
+    employee = models.ForeignKey(Employee, on_delete=models.PROTECT, related_name="attendance")
     date = models.DateField()
     status = models.CharField(
         max_length=100,

@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Q
 from phonenumber_field.modelfields import PhoneNumberField
 from django.contrib.auth.models import AbstractUser, UserManager
 
@@ -42,7 +43,7 @@ class User(AbstractUser):
         ('company_manager', 'Manager'),
         ('platform_admin', 'Platform Admin'),
     ]
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='company_admin')
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='company_manager')
     company = models.ForeignKey(
         Company,
         on_delete=models.SET_NULL,
@@ -54,6 +55,15 @@ class User(AbstractUser):
     updated_at = models.DateTimeField(auto_now=True)
 
     objects = CustomUserManager()
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                condition=Q(role='company_admin', company__isnull=True) |
+                          (~Q(role='platform_admin') & Q(company__isnull=False)),
+                name='platform_admin_has_no_company'
+            )
+        ]
 
     @property
     def full_name(self):

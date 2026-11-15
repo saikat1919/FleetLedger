@@ -1,6 +1,6 @@
 from django.db import models
 from django.conf import settings
-from FleetLedger.companies_and_users.models import Company
+from companies_and_users.models import Company
 
 # Create your models here.
 

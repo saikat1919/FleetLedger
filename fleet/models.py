@@ -1,9 +1,9 @@
 from django.db import models
 from django.db.models import Q
 from django.core.validators import MinValueValidator, MaxValueValidator
-from FleetLedger.companies_and_users.models import Company
+from companies_and_users.models import Company
 from phonenumber_field.modelfields import PhoneNumberField
-from FleetLedger.FleetLedger import settings
+from django.conf import settings
 
 
 # Create your models here.
@@ -28,7 +28,6 @@ class Employee(models.Model):
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
     phone = PhoneNumberField(
-        unique=True,
         blank=True,
         null=True,
     )
@@ -69,6 +68,22 @@ class Employee(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                condition=(Q(pay_type="commission") | Q(monthly_salary__isnull=False)),
+                name="salary_pay_needs_salary"
+            ),
+            models.UniqueConstraint(
+                condition=(Q(pay_type="salary") | Q(commission_rate__isnull=False)),
+                name="commission_needs_rate"
+            ),
+            models.UniqueConstraint(
+                fields=["company", "phone"],
+                name="unique_company_and_phone"
+            )
+        ]
+
     def __str__(self):
         return f"{self.first_name} {self.last_name} -> {self.company.company_name}"
 
@@ -81,8 +96,7 @@ class Vehicle(models.Model):
     ]
     company = models.ForeignKey(
         Company,
-        on_delete=models.SET_NULL,
-        null=True
+        on_delete=models.PROTECT,
     )
     registration_number = models.CharField(max_length=50)
     vehicle_model = models.CharField(max_length=100)
@@ -106,20 +120,17 @@ class Vehicle(models.Model):
 class VehicleAssignment(models.Model):
     company = models.ForeignKey(
         Company,
-        on_delete=models.SET_NULL,
-        null=True,
+        on_delete=models.PROTECT,
         related_name='vehicle_assignments'
     )
     vehicle = models.ForeignKey(
         Vehicle,
-        on_delete=models.SET_NULL,
-        null=True,
+        on_delete=models.PROTECT,
         related_name="vehicle_assignments"
     )
     driver = models.ForeignKey(
         Employee,
-        on_delete=models.SET_NULL,
-        null=True,
+        on_delete=models.PROTECT,
         related_name='vehicle_assignments',
     )
     start_date = models.DateField()

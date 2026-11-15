@@ -1,7 +1,7 @@
 from django.core.validators import MinValueValidator
 from django.db import models
-from FleetLedger.companies_and_users.models import Company
-from FleetLedger.fleet.models import Vehicle, Employee
+from companies_and_users.models import Company
+from fleet.models import Vehicle, Employee
 # Create your models here.
 
 
@@ -21,7 +21,7 @@ class ExpenseCategory(models.Model):
         ]
 
     def __str__(self):
-        return f"Expense type: {self.name}"
+        return f"{self.name}"
 
 class DailyEntry(models.Model):
     STATUS_CHOICES = [
