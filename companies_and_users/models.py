@@ -46,7 +46,7 @@ class User(AbstractUser):
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='company_manager')
     company = models.ForeignKey(
         Company,
-        on_delete=models.SET_NULL,
+        on_delete=models.PROTECT,
         null=True,
         blank=True,
         related_name='users'
@@ -59,7 +59,7 @@ class User(AbstractUser):
     class Meta:
         constraints = [
             models.CheckConstraint(
-                condition=Q(role='company_admin', company__isnull=True) |
+                condition=Q(role='platform_admin', company__isnull=True) |
                           (~Q(role='platform_admin') & Q(company__isnull=False)),
                 name='platform_admin_has_no_company'
             )
